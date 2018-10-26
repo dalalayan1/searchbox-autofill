@@ -11,8 +11,10 @@
 <body>
 
     <div id="wrapper" class="wrapper">
-        <input id="searchBox" class="search-box" placeholder="Search..."/>
-        <ul id="suggestionsWrapper" class="suggestions-wrapper hide"></ul>
+        <div id="searchWrapper" class="search-wrapper">
+            <input id="searchBox" class="search-box" placeholder="Search..." tabIndex="1000"/>
+            <ul id="suggestionsWrapper" class="suggestions-wrapper hide" tabIndex="1001"></ul>
+        </div>
     </div>
 
 </body>
