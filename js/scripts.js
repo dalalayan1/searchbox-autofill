@@ -7,6 +7,7 @@ window.onload = () => {
 const {
     getSuggestions
 } = SEARCHBOT;
+let latestSearchWord = "";
 
 /**
  * init - entry point
@@ -39,10 +40,11 @@ const hideSuggestions = () => {
 }
 
 /**
- * askSuggestions - makes the dummy API call to get suggestions
+ * askSuggestions - gets the input value and processes it for fetching data
  * @param {object} evt - event object
  */
 const askSuggestions = evt => {
+    //remove redundant white spaces
     const text = (evt.target.value).replace(/\s+/g,' ').trim();
     const wordsArr = text.split(" ");
     const noOfSpaces = wordsArr.length;
@@ -51,21 +53,31 @@ const askSuggestions = evt => {
         latestWord = wordsArr[noOfSpaces - 2];
     }
 
-
-    let timeOut,
-        timer = 1000;
+    if (latestWord) {
+        fetchAPIdata(latestWord);
+    }
     
+}
+
+/**
+ * fetchAPIdata - makes the dummy API call to get suggestions
+ * @param {string} searchWord - search parameter to fetch data
+ */
+const fetchAPIdata = searchWord => {
+    let timeOut,
+        timer = 2000;
+
     //clear the timeout if any key is pressed during the wait to optimize API calls.
     clearTimeout(timeOut);
 
     //restart the timer
     timeOut = setTimeout(() => {
-        getSuggestions(latestWord)
+        latestSearchWord = searchWord;
+        getSuggestions(searchWord)
             .then(data => {
                 populateSuggestions(data);
         });
     }, timer);
-    
 }
 
 /**
@@ -76,10 +88,15 @@ const populateSuggestions = suggestionsArray => {
     const suggestionsUl = document.getElementById("suggestionsWrapper");
     suggestionsUl.innerHTML = "";
     suggestionsArray.forEach((suggestion, ind) => {
-        const suggestionLi = document.createElement("li");
+        const startIdx = suggestion.indexOf(latestSearchWord),
+            beforeText = suggestion.slice(0,startIdx),
+            afterText = suggestion.slice(beforeText.length+latestSearchWord.length, suggestion.length),
+            suggestionLi = document.createElement("li");
         suggestionLi.tabIndex = ind;
         suggestionLi.classList.add("suggestion");
-        suggestionLi.textContent = suggestion;
+        suggestionLi.innerHTML = `${beforeText}<b>${latestSearchWord}</b>${afterText}`;
         suggestionsWrapper.appendChild(suggestionLi);
     });
+
 }
+
